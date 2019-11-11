@@ -32,6 +32,11 @@ def find_index(wavelength,waves):
 			break
 	return(index)
 
+def getRes(data,mean_flux):
+	res=[]
+	for i in range(len(data)):
+		res.append((data[i]-mean_flux[i]))
+	return(res)
 
 
 def calc_mean_flux(night,number_of_datapoints,):
@@ -124,11 +129,7 @@ def all_spectra_of_night(night):
 
 #all_spectra_of_night(night1)
 
-def getRes(data,mean_flux):
-	res=[]
-	for i in range(len(data)):
-		res.append((data[i]-mean_flux[i]))
-	return(res)
+################################ MY CODE     ############################################3
 
 #they contain wavelength intervals
 HeII4686 = []
@@ -153,7 +154,7 @@ get_line(HeII4686,index1,index2)
 get_line(HeII5411,index3,index4)
 get_line(NIV4058,index5,index6)
 
-
+#For night1, night2, night3
 def get_residuals_per_line(night,line):
 	residuals = []
 	mean_flux, mean_first_part, mean_second_part, mean_flux_scaled= calc_mean_flux(night,number_of_datapoints)	
@@ -163,10 +164,8 @@ def get_residuals_per_line(night,line):
 		index2 = find_index(line[-1],waves)
 		res= []
 		for j in range(index1,index2+1):
-			res.append(night[i][j]-mean_flux[j])
+			res.append(abs(night[i][j]-mean_flux[j]))
 		residuals.append(res)
-	#print residuals[0]
-	#print "length is = "+ str(len(residuals))
 
 	for i in range(len(night)):
 		index1 = find_index(line[0],waves)
@@ -179,18 +178,66 @@ def get_residuals_per_line(night,line):
 		fig=plt.figure()
 		plt.axvline(4058)
 		for i in range(len(night)):
-			plt.plot(line,residuals[i], label=i)
+			plt.plot(line,residuals[i])
 		plt.legend()
 		plt.xlabel('wavelength')
-		plt.ylabel('Residuals')
-		plt.title('Residuals')
+		plt.ylabel('Residuals + Offset')
+		plt.title('Absolute Residuals')
 		plt.show()
 
 	res_fig()
 
-get_residuals_per_line(night1,NIV4058)
+#get_residuals_per_line(night1,NIV4058)
+#get_residuals_per_line(night2,NIV4058)
+#get_residuals_per_line(night3,NIV4058)
 
 
+
+## Final night
+def get_residuals_per_line_final_night(line):
+	residuals = []
+	mean_flux4a, mean_first_part4a, mean_second_part4a, mean_flux_scaled4a = calc_mean_flux(night4a,number_of_datapoints)	
+	mean_flux4b, mean_first_part4b, mean_second_part4b, mean_flux_scaled4b = calc_mean_flux(night4b,number_of_datapoints)	
+
+	for i in range(len(night4a)):
+		index1 = find_index(line[0],waves)
+		index2 = find_index(line[-1],waves)
+		res= []
+		for j in range(index1,index2+1):
+			res.append(abs(night4a[i][j]-mean_flux4a[j]))
+		residuals.append(res)
+
+	for i in range(len(night4b)):
+		index3 = find_index(line[0],waves)
+		index4 = find_index(line[-1],waves)
+		res2= []
+		for j in range(index3,index4+1):
+			res2.append(abs(night4b[i][j]-mean_flux4b[j]))
+		residuals.append(res2)
+
+
+	for i in range(len(residuals)):
+		each_residual_length = len(residuals[i])
+		for j in range(each_residual_length):
+			residuals[i][j]= residuals[i][j] + i*0.3
+
+	def res_fig():
+		fig=plt.figure()
+		plt.axvline(4058)
+		for i in range(len(residuals)):
+			plt.plot(line,residuals[i])
+		plt.legend()
+		plt.xlabel('wavelength')
+		plt.ylabel('Residuals + Offest')
+		plt.title('Absolute Residuals Final Night')
+		plt.show()
+
+	res_fig()
+
+
+#get_residuals_per_line_final_night(NIV4058)
+
+#################################################################################################################3
 
 
 def all_plots(night): 
